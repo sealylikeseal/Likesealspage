@@ -22,41 +22,35 @@
 <h1 id="message">Checking your birthday...</h1>
 
 <script>
-(async function(){
-    // Ask for birthday
+(function(){
     let birthdayStr = prompt("Enter your birthday (YYYY-MM-DD):");
     if(!birthdayStr) {
         document.getElementById("message").textContent = "No birthday entered.";
         return;
     }
-    
-    // Get user's country & timezone from IP
-    let geoData = await fetch("https://ipapi.co/json/").then(r=>r.json());
-    let timezone = geoData.timezone;
-    let country = geoData.country_name;
 
-    // Parse birthday
     let [year, month, day] = birthdayStr.split("-").map(Number);
-    let now = new Date(new Date().toLocaleString("en-US", {timeZone: timezone}));
+
+    // Get local date & time zone from browser
+    let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let now = new Date();
     let age = now.getFullYear() - year;
-    
-    // Adjust if birthday hasn't happened yet this year
+
+    // Adjust age if birthday hasn't happened yet this year
     let thisYearBday = new Date(now.getFullYear(), month - 1, day);
     if (now < thisYearBday) age--;
 
-    // Check if today is their birthday
     if (now.getMonth() + 1 === month && now.getDate() === day) {
         document.getElementById("message").innerHTML = 
-            `🎉 Happy Birthday! 🎂<br>You are now ${age} years old in ${country}!`;
+            `🎉 Happy Birthday! 🎂<br>You are now ${age} years old!<br>Timezone: ${timezone}`;
     } else {
         let daysLeft = Math.ceil((thisYearBday - now) / (1000*60*60*24));
         if (daysLeft < 0) {
-            // Birthday already passed this year, calculate for next year
             let nextYearBday = new Date(now.getFullYear() + 1, month - 1, day);
             daysLeft = Math.ceil((nextYearBday - now) / (1000*60*60*24));
         }
         document.getElementById("message").innerHTML = 
-            `Not yet your birthday in ${country} 🎈<br>${daysLeft} days left!`;
+            `Not yet your birthday 🎈<br>${daysLeft} days left!<br>Timezone: ${timezone}`;
     }
 })();
 </script>
